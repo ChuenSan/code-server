@@ -84,6 +84,7 @@ jobs:
                 libstdc++ \
                 openssl-dev \
                 pkgconf \
+                python3 \
                 quilt \
                 rsync
               exec bash -x ci/build/build-postmarketos.sh
