@@ -56,6 +56,8 @@ jobs:
       - name: Build and test in musl environment
         shell: bash
         run: |
+          mkdir -p artifacts
+          set +e
           docker run --init \
             --name "code-server-build-${GITHUB_RUN_ID}" \
             --platform linux/arm64 \
@@ -84,8 +86,11 @@ jobs:
                 pkgconf \
                 quilt \
                 rsync
-              exec bash ci/build/build-postmarketos.sh
-            '
+              exec bash -x ci/build/build-postmarketos.sh
+            ' 2>&1 | tee artifacts/build.log
+          status=${PIPESTATUS[0]}
+          set -e
+          exit "$status"
 
       - name: Upload build artifact
         if: always()
