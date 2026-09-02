@@ -45,7 +45,24 @@ git submodule update --init --recursive
 quilt push -a
 
 SKIP_SUBMODULE_DEPS=1 npm ci --no-audit --no-fund
-npm --prefix lib/vscode ci --no-audit --no-fund
+npm --prefix lib/vscode ci --ignore-scripts --no-audit --no-fund
+native_keymap_binding="lib/vscode/node_modules/native-keymap/binding.gyp"
+python3 - "$native_keymap_binding" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+text = path.read_text()
+needle = "      'cflags': [\n        '-O2', '-fstack-protector-strong'\n      ],"
+replacement = needle + "\n      'cflags_cc': [\n        '-std=gnu++20'\n      ],"
+if "'cflags_cc':" not in text:
+    if needle not in text:
+        raise SystemExit(f"native-keymap binding shape changed: {path}")
+    path.write_text(text.replace(needle, replacement, 1))
+PY
+npm --prefix lib/vscode rebuild native-keymap --no-audit --no-fund
+npm_command=ci node lib/vscode/build/npm/postinstall.ts
+
 npm run build
 
 node_version="$(node -p 'process.versions.node')"
