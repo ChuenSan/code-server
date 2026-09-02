@@ -27,6 +27,8 @@
     "postinstall": "./ci/dev/postinstall.sh",
     "publish:npm": "./ci/steps/publish-npm.sh",
     "publish:docker": "./ci/steps/docker-buildx-push.sh",
+    "publish:npm": "./ci/steps/publish-npm.sh",
+    "publish:docker": "./ci/steps/docker-buildx-push.sh",
     "fmt": "npm run prettier && ./ci/dev/doctoc.sh",
     "lint:scripts": "./ci/dev/lint-scripts.sh",
     "lint:ts": "eslint --max-warnings=0 --fix $(git ls-files '*.ts' '*.js' | grep -v 'lib/vscode')",
@@ -42,12 +44,12 @@
     "@types/compression": "^1.7.3",
     "@types/cookie-parser": "^1.4.4",
     "@types/eslint__js": "^8.42.3",
-    "@types/express": "^5.0.0",
+    "@types/express": "^5.0.1",
     "@types/http-proxy": "1.17.7",
     "@types/js-yaml": "^4.0.6",
     "@types/node": "24.x",
     "@types/pem": "^1.14.1",
-    "@types/proxy-from-env": "^1.0.1",
+    "@types/proxy-from-env": "^1.0.0",
     "@types/safe-compare": "^1.1.0",
     "@types/semver": "^7.5.2",
     "@types/trusted-types": "^2.0.4",
@@ -82,7 +84,7 @@
     "proxy-agent": "^6.3.1",
     "qs": "^6.15.0",
     "rotating-file-stream": "^3.1.1",
-    "safe-compare": "^1.1.4",
+    "safe-compare": "^1.1.0",
     "semver": "^7.5.4",
     "ws": "^8.14.2",
     "xdg-basedir": "^4.0.0"
@@ -99,7 +101,6 @@
     "ide",
     "coder",
     "vscode-remote",
-    "browser-ide",
     "remote-development"
   ],
   "engines": {
@@ -148,5 +149,9 @@
       "^.+\\.(css|less)$": "<rootDir>/test/utils/cssStub.ts"
     },
     "globalSetup": "<rootDir>/test/utils/globalUnitSetup.ts"
+  },
+  "allowScripts": {
+    "argon2@0.44.0": true,
+    "unrs-resolver@1.11.1": true
   }
 }

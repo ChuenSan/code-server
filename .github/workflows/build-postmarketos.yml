@@ -1,0 +1,98 @@
+name: Build postmarketOS ARM64
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/build-postmarketos.yml"
+      - "ci/build/build-postmarketos.sh"
+      - "ci/build/build-vscode.sh"
+      - "ci/build/build-release.sh"
+      - "ci/build/npm-postinstall.sh"
+      - "src/**"
+      - "patches/**"
+      - "lib/**"
+      - "package.json"
+      - "package-lock.json"
+      - "CHANGELOG.md"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Code Server version; blank uses the latest changelog version"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: postmarketOS edge / aarch64 / musl
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 240
+    env:
+      VERSION_INPUT: ${{ inputs.version }}
+
+    steps:
+      - name: Checkout source and VS Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
+        with:
+          fetch-depth: 1
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Resolve Node version
+        shell: bash
+        run: |
+          node_version="$(tr -d '\r\n' < .node-version)"
+          test -n "$node_version"
+          echo "NODE_VERSION=$node_version" >> "$GITHUB_ENV"
+
+      - name: Build and test in musl environment
+        shell: bash
+        run: |
+          docker run --init \
+            --name "code-server-build-${GITHUB_RUN_ID}" \
+            --platform linux/arm64 \
+            --env CI=1 \
+            --env MINIFY=true \
+            --env NODE_VERSION \
+            --env VERSION_INPUT \
+            --volume "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" \
+            --workdir "$GITHUB_WORKSPACE" \
+            "node:${NODE_VERSION}-alpine" \
+            /bin/sh -ec '
+              apk add --no-cache \
+                alpine-sdk \
+                bash \
+                binutils \
+                ca-certificates \
+                curl \
+                file \
+                git \
+                git-lfs \
+                jq \
+                krb5-dev \
+                libc6-compat \
+                libstdc++ \
+                openssl-dev \
+                pkgconf \
+                quilt \
+                rsync
+              exec bash ci/build/build-postmarketos.sh
+            '
+
+      - name: Upload build artifact
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: code-server-postmarketos-arm64-musl
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 14
+          compression-level: 0
