@@ -78,7 +78,7 @@ jobs:
                 git-lfs \
                 jq \
                 krb5-dev \
-                libc6-compat \
+                gcompat \
                 libstdc++ \
                 openssl-dev \
                 pkgconf \
