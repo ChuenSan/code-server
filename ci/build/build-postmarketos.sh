@@ -5,7 +5,7 @@ cd "$(dirname "$0")/../.."
 
 VERSION="${VERSION_INPUT-}"
 if [[ -z "$VERSION" ]]; then
-  VERSION="$(sed -n 's/^## \[\([0-9\.]*\)\].*/\1/p' CHANGELOG.md | head -n 1)"
+  VERSION="$(sed -n 's/^## \[\([0-9][0-9.]*\)\].*/\1/p' CHANGELOG.md | head -n 1)"
 fi
 
 if [[ ! "$VERSION" =~ ^[0-9A-Za-z][0-9A-Za-z.+-]*$ ]]; then
@@ -34,7 +34,7 @@ npm --prefix lib/vscode ci --no-audit --no-fund
 npm run build
 
 node_version="$(node -p 'process.versions.node')"
-expected_node_version="$(sed -n 's/^target="\([^"\]*\)"$/\1/p' lib/vscode/remote/.npmrc | head -n 1)"
+expected_node_version="$(sed -n 's/^target="\([^"]*\)"$/\1/p' lib/vscode/remote/.npmrc | head -n 1)"
 if [[ "$node_version" != "$expected_node_version" ]]; then
   echo "Node version mismatch: running $node_version, VS Code requires $expected_node_version" >&2
   exit 1
