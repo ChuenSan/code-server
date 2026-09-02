@@ -19,6 +19,8 @@ export MINIFY="${MINIFY-true}"
 export ELECTRON_SKIP_BINARY_DOWNLOAD=1
 export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 export npm_config_build_from_source=true
+export npm_config_cxxflags="${npm_config_cxxflags-} -std=gnu++20"
+export CXXFLAGS="${CXXFLAGS-} -std=gnu++20"
 export npm_config_audit=false
 export npm_config_fund=false
 
