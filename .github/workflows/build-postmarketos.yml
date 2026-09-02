@@ -103,7 +103,7 @@ jobs:
           exit "$status"
 
       - name: Publish build diagnostics
-        if: always()
+        if: failure()
         shell: bash
         run: |
           if [[ -f artifacts/build.log ]]; then
