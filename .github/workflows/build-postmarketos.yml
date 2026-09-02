@@ -111,7 +111,7 @@ jobs:
               line=${line//'%'/'%25'}
               line=${line//$'\r'/'%0D'}
               printf '::error file=build.log::%s\n' "$line"
-            done < <(awk '/fatal error:|: error:| error:|Error:|make:|No such file|not found/ { lines[count % 40] = $0; count++ } END { start = count > 20 ? count - 20 : 0; for (i = start; i < count; i++) print lines[i % 40] }' artifacts/build.log)
+            done < <(awk '{ lines[count % 20] = $0; count++ } END { start = count > 20 ? count - 20 : 0; for (i = start; i < count; i++) print lines[i % 20] }' artifacts/build.log)
           fi
 
       - name: Upload build artifact
