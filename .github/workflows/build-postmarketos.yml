@@ -89,6 +89,12 @@ jobs:
               exec bash -x ci/build/build-postmarketos.sh
             ' 2>&1 | tee artifacts/build.log
           status=${PIPESTATUS[0]}
+          {
+            echo "### Native build log"
+            echo '```text'
+            tail -n 200 artifacts/build.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
           set -e
           exit "$status"
 
