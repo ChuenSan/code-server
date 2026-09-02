@@ -24,6 +24,19 @@ export CXXFLAGS="${CXXFLAGS-} -std=gnu++20"
 export npm_config_audit=false
 export npm_config_fund=false
 
+mkdir -p "$HOME/.gyp"
+cat > "$HOME/.gyp/include.gypi" <<'EOF'
+{
+  "target_defaults": {
+    "conditions": [
+      ["OS=='linux'", {
+        "cflags_cc": ["-std=gnu++20"]
+      }]
+    ]
+  }
+}
+EOF
+
 printf 'Building code-server %s for Alpine ARM64 (musl)\n' "$VERSION"
 
 git config --global --add safe.directory "$PWD"
