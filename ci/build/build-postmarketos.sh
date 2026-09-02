@@ -5,7 +5,7 @@ cd "$(dirname "$0")/../.."
 
 VERSION="${VERSION_INPUT-}"
 if [[ -z "$VERSION" ]]; then
-  VERSION="$(sed -n 's/^## \[\([0-9][0-9.]*\)\].*/\1/p' CHANGELOG.md | head -n 1)"
+  VERSION="$(awk '/^## Unreleased$/ { active=1; next } active && match($0, /^## \[[0-9][0-9.]*\]/) { value=$0; sub(/^## \[/, "", value); sub(/\].*$/, "", value); print value; exit }' CHANGELOG.md)"
 fi
 
 if [[ ! "$VERSION" =~ ^[0-9A-Za-z][0-9A-Za-z.+-]*$ ]]; then
