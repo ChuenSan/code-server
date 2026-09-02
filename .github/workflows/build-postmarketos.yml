@@ -81,6 +81,9 @@ jobs:
                 jq \
                 krb5-dev \
                 gcompat \
+                libsecret-dev \
+                libx11-dev \
+                libxkbfile-dev \
                 libstdc++ \
                 openssl-dev \
                 pkgconf \
