@@ -44,6 +44,7 @@ git config --global --add safe.directory "$PWD/lib/vscode"
 git submodule update --init --recursive
 quilt push -a
 
+expected_node_version="$(awk -F'"' '$1 == "target=" { print $2; exit }' lib/vscode/remote/.npmrc)"
 SKIP_SUBMODULE_DEPS=1 npm ci --no-audit --no-fund
 npm --prefix lib/vscode ci --ignore-scripts --no-audit --no-fund
 native_keymap_binding="lib/vscode/node_modules/native-keymap/binding.gyp"
@@ -60,13 +61,15 @@ if "'cflags_cc':" not in text:
         raise SystemExit(f"native-keymap binding shape changed: {path}")
     path.write_text(text.replace(needle, replacement, 1))
 PY
-npm --prefix lib/vscode rebuild native-keymap --no-audit --no-fund
+npm_config_runtime=node \
+  npm_config_target="$expected_node_version" \
+  npm_config_disturl=https://nodejs.org/dist \
+  npm --prefix lib/vscode rebuild native-keymap --no-audit --no-fund
 npm_command=ci node lib/vscode/build/npm/postinstall.ts
 
 npm run build
 
 node_version="$(node -p 'process.versions.node')"
-expected_node_version="$(sed -n 's/^target="\([^"]*\)"$/\1/p' lib/vscode/remote/.npmrc | head -n 1)"
 if [[ "$node_version" != "$expected_node_version" ]]; then
   echo "Node version mismatch: running $node_version, VS Code requires $expected_node_version" >&2
   exit 1
