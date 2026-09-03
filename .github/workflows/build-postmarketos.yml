@@ -100,14 +100,15 @@ jobs:
               status=$?
               echo "build script exit: $status"
               exit "$status"
-            ' 2>&1 | tee artifacts/build.log
-          status=${PIPESTATUS[0]}
+            ' > artifacts/build.log 2>&1
+          status=$?
           {
             echo "### Native build log"
             echo '```text'
             tail -n 200 artifacts/build.log
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          tail -n 200 artifacts/build.log
           set -e
           exit "$status"
 
