@@ -87,7 +87,7 @@ mkdir -p artifacts
 
 test -x release/bin/code-server
 test -x release/lib/node
-ldd release/lib/node 2>&1 | grep -q musl
+ldd release/lib/node 2>&1 | grep musl >/dev/null
 
 test -n "$(find release -type f -path '*linuxmusl-arm64/runtime.node' -print -quit)"
 
