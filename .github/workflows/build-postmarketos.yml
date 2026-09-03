@@ -22,9 +22,14 @@ on:
         description: "Code Server version; blank uses the latest changelog version"
         required: false
         type: string
+      publish_release:
+        description: "Publish the validated tarball as a public prerelease asset"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -127,3 +132,19 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
           compression-level: 0
+
+      - name: Publish deployable release asset
+        if: >-
+          success() &&
+          ((github.event_name == 'workflow_dispatch' && inputs.publish_release == true) ||
+          (github.event_name == 'push' && startsWith(github.event.head_commit.message, '[publish-postmarketos]')))
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236f1dcb99157228 # v3.0.2
+        with:
+          tag_name: postmarketos-${{ github.run_id }}
+          name: postmarketOS ARM64 musl ${{ github.run_id }}
+          prerelease: true
+          generate_release_notes: false
+          files: |
+            artifacts/code-server-*-postmarketos-arm64-musl.tar.gz
+            artifacts/code-server-*-postmarketos-arm64-musl.sha256
+            artifacts/code-server-*-postmarketos-arm64-musl.txt
