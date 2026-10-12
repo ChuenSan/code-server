@@ -363,13 +363,14 @@ export class CodeServerPage {
   }
 
   /**
-   * Checks if the test extension loaded
+   * Checks if the test extension loaded by waiting for its notification.  Once
+   * it appears, dismiss the notification.
    */
   async waitForTestExtensionLoaded(): Promise<void> {
-    const selector = "text=test extension loaded"
     this.codeServer.logger.debug("Waiting for test extension to load...")
-
-    await this.page.waitForSelector(selector)
+    const locator = this.page.getByRole("dialog", { name: "Info: test extension loaded" })
+    await locator.hover()
+    await locator.getByLabel("Clear Notification (Del)").click()
   }
 
   /**
@@ -437,6 +438,7 @@ export class CodeServerPage {
   async executeCommandViaMenus(command: string) {
     await this.navigateMenus(["View", "Command Palette..."])
 
+    await this.page.waitForSelector(".quick-input-widget:focus-within")
     await this.page.keyboard.type(command)
 
     await this.page.hover(`text=${command}`)

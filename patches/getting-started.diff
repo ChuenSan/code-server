@@ -19,7 +19,7 @@ Index: code-server/lib/vscode/src/vs/workbench/contrib/welcomeGettingStarted/bro
  import { renderFormattedText } from '../../../../base/browser/formattedTextRenderer.js';
  import { status } from '../../../../base/browser/ui/aria/aria.js';
  import { StandardKeyboardEvent } from '../../../../base/browser/keyboardEvent.js';
-@@ -54,7 +54,7 @@ import { IRecentFolder, IRecentWorkspace
+@@ -55,7 +55,7 @@ import { IRecentFolder, IRecentWorkspace
  import { OpenRecentAction } from '../../../browser/actions/windowActions.js';
  import { OpenFileFolderAction, OpenFolderAction, OpenFolderViaWorkspaceAction } from '../../../browser/actions/workspaceActions.js';
  import { EditorPane } from '../../../browser/parts/editor/editorPane.js';
@@ -28,7 +28,7 @@ Index: code-server/lib/vscode/src/vs/workbench/contrib/welcomeGettingStarted/bro
  import { IEditorOpenContext, IEditorSerializer } from '../../../common/editor.js';
  import { IWebviewElement, IWebviewService } from '../../webview/browser/webview.js';
  import './gettingStartedColors.js';
-@@ -928,6 +928,72 @@ export class GettingStartedPage extends
+@@ -930,6 +930,72 @@ export class GettingStartedPage extends
  			$('p.subtitle.description', {}, localize({ key: 'gettingStarted.editingEvolved', comment: ['Shown as subtitle on the Welcome page.'] }, "Editing evolved"))
  		);
  
@@ -101,7 +101,7 @@ Index: code-server/lib/vscode/src/vs/workbench/contrib/welcomeGettingStarted/bro
  		const leftColumn = $('.categories-column.categories-column-left', {},);
  		const rightColumn = $('.categories-column.categories-column-right', {},);
  
-@@ -977,6 +1043,9 @@ export class GettingStartedPage extends
+@@ -980,6 +1046,9 @@ export class GettingStartedPage extends
  				recentList.setLimit(5);
  				reset(leftColumn, startList.getDomElement(), recentList.getDomElement());
  			}
@@ -151,7 +151,7 @@ Index: code-server/lib/vscode/src/vs/workbench/services/environment/browser/envi
 ===================================================================
 --- code-server.orig/lib/vscode/src/vs/workbench/services/environment/browser/environmentService.ts
 +++ code-server/lib/vscode/src/vs/workbench/services/environment/browser/environmentService.ts
-@@ -44,6 +44,11 @@ export interface IBrowserWorkbenchEnviro
+@@ -49,6 +49,11 @@ export interface IBrowserWorkbenchEnviro
  	readonly isEnabledFileUploads?: boolean;
  
  	/**
@@ -163,7 +163,7 @@ Index: code-server/lib/vscode/src/vs/workbench/services/environment/browser/envi
  	 * Gets whether a resolver extension is expected for the environment.
  	 */
  	readonly expectsResolverExtension: boolean;
-@@ -135,6 +140,13 @@ export class BrowserWorkbenchEnvironment
+@@ -140,6 +145,13 @@ export class BrowserWorkbenchEnvironment
  		return this.options.isEnabledFileUploads;
  	}
  
@@ -181,7 +181,7 @@ Index: code-server/lib/vscode/src/vs/server/node/serverEnvironmentService.ts
 ===================================================================
 --- code-server.orig/lib/vscode/src/vs/server/node/serverEnvironmentService.ts
 +++ code-server/lib/vscode/src/vs/server/node/serverEnvironmentService.ts
-@@ -21,6 +21,7 @@ export const serverOptions: OptionDescri
+@@ -37,6 +37,7 @@ export const serverOptions: OptionDescri
  	'auth': { type: 'string' },
  	'disable-file-downloads': { type: 'boolean' },
  	'disable-file-uploads': { type: 'boolean' },
@@ -189,7 +189,7 @@ Index: code-server/lib/vscode/src/vs/server/node/serverEnvironmentService.ts
  
  	/* ----- server setup ----- */
  
-@@ -118,6 +119,7 @@ export interface ServerParsedArgs {
+@@ -134,6 +135,7 @@ export interface ServerParsedArgs {
  	'auth'?: string;
  	'disable-file-downloads'?: boolean;
  	'disable-file-uploads'?: boolean;
@@ -201,7 +201,7 @@ Index: code-server/lib/vscode/src/vs/server/node/webClientServer.ts
 ===================================================================
 --- code-server.orig/lib/vscode/src/vs/server/node/webClientServer.ts
 +++ code-server/lib/vscode/src/vs/server/node/webClientServer.ts
-@@ -384,6 +384,7 @@ export class WebClientServer {
+@@ -429,6 +429,7 @@ export class WebClientServer {
  			userDataPath: this._environmentService.userDataPath,
  			isEnabledFileDownloads: !this._environmentService.args['disable-file-downloads'],
  			isEnabledFileUploads: !this._environmentService.args['disable-file-uploads'],
@@ -216,13 +216,13 @@ Index: code-server/lib/vscode/src/vs/workbench/browser/contextkeys.ts
 @@ -6,7 +6,7 @@
  import { Disposable } from '../../base/common/lifecycle.js';
  import { IContextKeyService, IContextKey, setConstant as setConstantContextKey } from '../../platform/contextkey/common/contextkey.js';
- import { IsMacContext, IsLinuxContext, IsWindowsContext, IsWebContext, IsMacNativeContext, IsDevelopmentContext, IsIOSContext, ProductQualityContext, IsMobileContext } from '../../platform/contextkey/common/contextkeys.js';
+ import { IsMacContext, IsLinuxContext, IsWindowsContext, IsWebContext, IsMacNativeContext, IsDevelopmentContext, IsIOSContext, ProductQualityContext, IsMobileContext, IsChromeOSContext } from '../../platform/contextkey/common/contextkeys.js';
 -import { IsEnabledFileDownloads, IsEnabledFileUploads, SplitEditorsVertically, InEditorZenModeContext, AuxiliaryBarVisibleContext, SecondarySideBarVisibleContext, SideBarVisibleContext, PanelAlignmentContext, PanelMaximizedContext, PanelVisibleContext, EmbedderIdentifierContext, EditorTabsVisibleContext, IsMainEditorCenteredLayoutContext, MainEditorAreaVisibleContext, DirtyWorkingCopiesContext, EmptyWorkspaceSupportContext, EnterMultiRootWorkspaceSupportContext, HasWebFileSystemAccess, IsMainWindowFullscreenContext, OpenFolderWorkspaceSupportContext, RemoteNameContext, VirtualWorkspaceContext, WorkbenchStateContext, WorkspaceFolderCountContext, PanelPositionContext, TemporaryWorkspaceContext, TitleBarVisibleContext, TitleBarStyleContext, IsAuxiliaryWindowFocusedContext, ActiveEditorGroupEmptyContext, ActiveEditorGroupIndexContext, ActiveEditorGroupLastContext, ActiveEditorGroupLockedContext, MultipleEditorGroupsContext, EditorsVisibleContext, AuxiliaryBarMaximizedContext, InAutomationContext, IsSessionsWindowContext } from '../common/contextkeys.js';
 +import { IsEnabledFileDownloads, IsEnabledFileUploads, IsEnabledCoderGettingStarted, SplitEditorsVertically, InEditorZenModeContext, AuxiliaryBarVisibleContext, SecondarySideBarVisibleContext, SideBarVisibleContext, PanelAlignmentContext, PanelMaximizedContext, PanelVisibleContext, EmbedderIdentifierContext, EditorTabsVisibleContext, IsMainEditorCenteredLayoutContext, MainEditorAreaVisibleContext, DirtyWorkingCopiesContext, EmptyWorkspaceSupportContext, EnterMultiRootWorkspaceSupportContext, HasWebFileSystemAccess, IsMainWindowFullscreenContext, OpenFolderWorkspaceSupportContext, RemoteNameContext, VirtualWorkspaceContext, WorkbenchStateContext, WorkspaceFolderCountContext, PanelPositionContext, TemporaryWorkspaceContext, TitleBarVisibleContext, TitleBarStyleContext, IsAuxiliaryWindowFocusedContext, ActiveEditorGroupEmptyContext, ActiveEditorGroupIndexContext, ActiveEditorGroupLastContext, ActiveEditorGroupLockedContext, MultipleEditorGroupsContext, EditorsVisibleContext, AuxiliaryBarMaximizedContext, InAutomationContext, IsSessionsWindowContext } from '../common/contextkeys.js';
  import { preferredSideBySideGroupDirection, GroupDirection, IEditorGroupsService } from '../services/editor/common/editorGroupsService.js';
  import { IConfigurationService } from '../../platform/configuration/common/configuration.js';
  import { IBrowserWorkbenchEnvironmentService } from '../services/environment/browser/environmentService.js';
-@@ -208,6 +208,7 @@ export class WorkbenchContextKeysHandler
+@@ -209,6 +209,7 @@ export class WorkbenchContextKeysHandler
  		// code-server
  		IsEnabledFileDownloads.bindTo(this.contextKeyService).set(this.environmentService.isEnabledFileDownloads ?? true)
  		IsEnabledFileUploads.bindTo(this.contextKeyService).set(this.environmentService.isEnabledFileUploads ?? true)

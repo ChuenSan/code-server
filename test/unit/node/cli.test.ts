@@ -5,6 +5,7 @@ import {
   UserProvidedArgs,
   bindAddrFromArgs,
   defaultConfigFile,
+  defaultSessionSocket,
   parse,
   parseConfigFile,
   setDefaults,
@@ -37,7 +38,7 @@ const defaults = {
   usingEnvHashedPassword: false,
   "extensions-dir": path.join(paths.data, "extensions"),
   "user-data-dir": paths.data,
-  "session-socket": path.join(paths.data, "code-server-ipc.sock"),
+  "session-socket": defaultSessionSocket(paths.data),
   "app-name": "code-server",
   _: [],
 }
@@ -265,6 +266,16 @@ describe("parser", () => {
     expect(() => parse(["--port", "foo"])).toThrowError(/--port must be a number/)
     expect(() => parse(["--auth", "invalid"])).toThrowError(/--auth valid values: \[password, none\]/)
     expect(() => parse(["--log", "invalid"])).toThrowError(/--log valid values: \[trace, debug, info, warn, error\]/)
+  })
+
+  it("should error if idle-timeout-seconds is too low", () => {
+    expect(() => parse(["--idle-timeout-seconds=60"])).toThrowError(
+      /--idle-timeout-seconds must be greater than 60 seconds/,
+    )
+    expect(() => parse(["--idle-timeout-seconds", "60"])).toThrowError(
+      /--idle-timeout-seconds must be greater than 60 seconds/,
+    )
+    expect(parse(["--idle-timeout-seconds", "61"])).toEqual({ "idle-timeout-seconds": 61 })
   })
 
   it("should error if the option doesn't exist", () => {
@@ -977,6 +988,26 @@ describe("bindAddrFromArgs", () => {
   })
 })
 
+describe("defaultSessionSocket", () => {
+  const dataDir = path.join("/home/coder/.local/share", "code-server")
+
+  it("should put the socket in the user data directory", () => {
+    expect(defaultSessionSocket(dataDir, "linux")).toBe(path.join(dataDir, "code-server-ipc.sock"))
+  })
+
+  it("should use a named pipe on windows", () => {
+    expect(defaultSessionSocket(dataDir, "win32")).toMatch(/^\\\\\.\\pipe\\code-server-ipc-[0-9a-f]{16}$/)
+  })
+
+  it("should give separate data directories separate pipes", () => {
+    expect(defaultSessionSocket(dataDir, "win32")).not.toBe(defaultSessionSocket(dataDir + "-other", "win32"))
+  })
+
+  it("should give one data directory one pipe however it is spelled", () => {
+    expect(defaultSessionSocket(dataDir.toUpperCase(), "win32")).toBe(defaultSessionSocket(dataDir, "win32"))
+  })
+})
+
 describe("defaultConfigFile", () => {
   it("should return the default config file as a string", async () => {
     const password = await generatePassword()
@@ -1033,6 +1064,13 @@ describe("toCodeArgs", () => {
       "enable-sandbox": true,
       agents: true,
       "enable-smoke-test-driver": false,
+    })
+  })
+
+  it("should pass through --enable-remote-storage", async () => {
+    expect(await toCodeArgs(await setDefaults(parse(["--enable-remote-storage"])))).toStrictEqual({
+      ...vscodeDefaults,
+      "enable-remote-storage": true,
     })
   })
 

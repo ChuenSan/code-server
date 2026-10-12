@@ -48,8 +48,8 @@ Index: code-server/lib/vscode/src/vs/workbench/services/environment/browser/envi
 ===================================================================
 --- code-server.orig/lib/vscode/src/vs/workbench/services/environment/browser/environmentService.ts
 +++ code-server/lib/vscode/src/vs/workbench/services/environment/browser/environmentService.ts
-@@ -34,6 +34,16 @@ export interface IBrowserWorkbenchEnviro
- 	readonly options?: IWorkbenchConstructionOptions;
+@@ -39,6 +39,16 @@ export interface IBrowserWorkbenchEnviro
+ 	readonly sessionTitle?: string;
  
  	/**
 +	 * Enable downloading files via menu actions.
@@ -65,7 +65,7 @@ Index: code-server/lib/vscode/src/vs/workbench/services/environment/browser/envi
  	 * Gets whether a resolver extension is expected for the environment.
  	 */
  	readonly expectsResolverExtension: boolean;
-@@ -111,6 +121,20 @@ export class BrowserWorkbenchEnvironment
+@@ -116,6 +126,20 @@ export class BrowserWorkbenchEnvironment
  		return this.options.userDataPath;
  	}
  
@@ -90,7 +90,7 @@ Index: code-server/lib/vscode/src/vs/server/node/serverEnvironmentService.ts
 ===================================================================
 --- code-server.orig/lib/vscode/src/vs/server/node/serverEnvironmentService.ts
 +++ code-server/lib/vscode/src/vs/server/node/serverEnvironmentService.ts
-@@ -19,6 +19,8 @@ export const serverOptions: OptionDescri
+@@ -35,6 +35,8 @@ export const serverOptions: OptionDescri
  	/* ----- code-server ----- */
  	'disable-update-check': { type: 'boolean' },
  	'auth': { type: 'string' },
@@ -99,7 +99,7 @@ Index: code-server/lib/vscode/src/vs/server/node/serverEnvironmentService.ts
  
  	/* ----- server setup ----- */
  
-@@ -114,6 +116,8 @@ export interface ServerParsedArgs {
+@@ -130,6 +132,8 @@ export interface ServerParsedArgs {
  	/* ----- code-server ----- */
  	'disable-update-check'?: boolean;
  	'auth'?: string;
@@ -112,7 +112,7 @@ Index: code-server/lib/vscode/src/vs/server/node/webClientServer.ts
 ===================================================================
 --- code-server.orig/lib/vscode/src/vs/server/node/webClientServer.ts
 +++ code-server/lib/vscode/src/vs/server/node/webClientServer.ts
-@@ -380,6 +380,8 @@ export class WebClientServer {
+@@ -425,6 +425,8 @@ export class WebClientServer {
  			serverBasePath: basePath,
  			webviewEndpoint: staticRoute + '/out/vs/workbench/contrib/webview/browser/pre',
  			userDataPath: this._environmentService.userDataPath,
@@ -128,7 +128,7 @@ Index: code-server/lib/vscode/src/vs/workbench/browser/contextkeys.ts
 @@ -6,10 +6,10 @@
  import { Disposable } from '../../base/common/lifecycle.js';
  import { IContextKeyService, IContextKey, setConstant as setConstantContextKey } from '../../platform/contextkey/common/contextkey.js';
- import { IsMacContext, IsLinuxContext, IsWindowsContext, IsWebContext, IsMacNativeContext, IsDevelopmentContext, IsIOSContext, ProductQualityContext, IsMobileContext } from '../../platform/contextkey/common/contextkeys.js';
+ import { IsMacContext, IsLinuxContext, IsWindowsContext, IsWebContext, IsMacNativeContext, IsDevelopmentContext, IsIOSContext, ProductQualityContext, IsMobileContext, IsChromeOSContext } from '../../platform/contextkey/common/contextkeys.js';
 -import { SplitEditorsVertically, InEditorZenModeContext, AuxiliaryBarVisibleContext, SecondarySideBarVisibleContext, SideBarVisibleContext, PanelAlignmentContext, PanelMaximizedContext, PanelVisibleContext, EmbedderIdentifierContext, EditorTabsVisibleContext, IsMainEditorCenteredLayoutContext, MainEditorAreaVisibleContext, DirtyWorkingCopiesContext, EmptyWorkspaceSupportContext, EnterMultiRootWorkspaceSupportContext, HasWebFileSystemAccess, IsMainWindowFullscreenContext, OpenFolderWorkspaceSupportContext, RemoteNameContext, VirtualWorkspaceContext, WorkbenchStateContext, WorkspaceFolderCountContext, PanelPositionContext, TemporaryWorkspaceContext, TitleBarVisibleContext, TitleBarStyleContext, IsAuxiliaryWindowFocusedContext, ActiveEditorGroupEmptyContext, ActiveEditorGroupIndexContext, ActiveEditorGroupLastContext, ActiveEditorGroupLockedContext, MultipleEditorGroupsContext, EditorsVisibleContext, AuxiliaryBarMaximizedContext, InAutomationContext, IsSessionsWindowContext } from '../common/contextkeys.js';
 +import { IsEnabledFileDownloads, IsEnabledFileUploads, SplitEditorsVertically, InEditorZenModeContext, AuxiliaryBarVisibleContext, SecondarySideBarVisibleContext, SideBarVisibleContext, PanelAlignmentContext, PanelMaximizedContext, PanelVisibleContext, EmbedderIdentifierContext, EditorTabsVisibleContext, IsMainEditorCenteredLayoutContext, MainEditorAreaVisibleContext, DirtyWorkingCopiesContext, EmptyWorkspaceSupportContext, EnterMultiRootWorkspaceSupportContext, HasWebFileSystemAccess, IsMainWindowFullscreenContext, OpenFolderWorkspaceSupportContext, RemoteNameContext, VirtualWorkspaceContext, WorkbenchStateContext, WorkspaceFolderCountContext, PanelPositionContext, TemporaryWorkspaceContext, TitleBarVisibleContext, TitleBarStyleContext, IsAuxiliaryWindowFocusedContext, ActiveEditorGroupEmptyContext, ActiveEditorGroupIndexContext, ActiveEditorGroupLastContext, ActiveEditorGroupLockedContext, MultipleEditorGroupsContext, EditorsVisibleContext, AuxiliaryBarMaximizedContext, InAutomationContext, IsSessionsWindowContext } from '../common/contextkeys.js';
  import { preferredSideBySideGroupDirection, GroupDirection, IEditorGroupsService } from '../services/editor/common/editorGroupsService.js';
@@ -147,7 +147,7 @@ Index: code-server/lib/vscode/src/vs/workbench/browser/contextkeys.ts
  		@IProductService private readonly productService: IProductService,
  		@IEditorGroupsService private readonly editorGroupService: IEditorGroupsService,
  		@IEditorService private readonly editorService: IEditorService,
-@@ -205,6 +205,10 @@ export class WorkbenchContextKeysHandler
+@@ -206,6 +206,10 @@ export class WorkbenchContextKeysHandler
  		this.auxiliaryBarMaximizedContext = AuxiliaryBarMaximizedContext.bindTo(this.contextKeyService);
  		this.auxiliaryBarMaximizedContext.set(this.layoutService.isAuxiliaryBarMaximized());
  

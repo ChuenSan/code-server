@@ -41,6 +41,11 @@ main() {
     rsync ./ci/build/code-server.sh "$RELEASE_PATH/bin/code-server"
     chmod 755 "$RELEASE_PATH/bin/code-server"
 
+    # Windows cannot run the shell launcher, so it gets one of its own.
+    if [ "$OS" = windows ]; then
+      rsync ./ci/build/code-server.cmd "$RELEASE_PATH/bin/code-server.cmd"
+    fi
+
     # Delete the extra bin scripts.
     rm "$RELEASE_PATH/lib/vscode/bin/remote-cli/code-darwin.sh"
     rm "$RELEASE_PATH/lib/vscode/bin/remote-cli/code-linux.sh"
@@ -111,6 +116,7 @@ bundle_vscode() {
 
   # Exclude Node since we want to place it in a directory above.
   rsync_opts+=(--exclude /node)
+  rsync_opts+=(--exclude /node.exe)
 
   # Exclude Node modules.  Note that these will already only include production
   # dependencies, so if we do keep them there is no need to do any
@@ -123,7 +129,11 @@ bundle_vscode() {
 
   # Copy the Node binary.
   if [[ $KEEP_MODULES = 1 ]]; then
-    cp "./lib/vscode-reh-web-$VSCODE_TARGET/node" "$RELEASE_PATH/lib"
+    if [ "$OS" = windows ]; then
+      cp "./lib/vscode-reh-web-$VSCODE_TARGET/node.exe" "$RELEASE_PATH/lib"
+    else
+      cp "./lib/vscode-reh-web-$VSCODE_TARGET/node" "$RELEASE_PATH/lib"
+    fi
   fi
 
   # Merge the package.json for the web/remote server so we can include

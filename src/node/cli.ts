@@ -1,4 +1,5 @@
 import { field, Level, logger } from "@coder/logger"
+import * as crypto from "crypto"
 import { promises as fs } from "fs"
 import { load } from "js-yaml"
 import * as path from "path"
@@ -46,6 +47,7 @@ export interface UserProvidedCodeArgs {
   "show-versions"?: boolean
   category?: string
   "github-auth"?: string
+  "enable-remote-storage"?: boolean
   "disable-update-check"?: boolean
   "disable-file-downloads"?: boolean
   "disable-file-uploads"?: boolean
@@ -274,6 +276,10 @@ export const options: Options<Required<UserProvidedArgs>> = {
     type: "string",
     description: "GitHub authentication token (can only be passed in via $GITHUB_TOKEN or the config file).",
   },
+  "enable-remote-storage": {
+    type: "boolean",
+    description: "Persist VS Code workbench storage on the remote server instead of browser storage.",
+  },
   "proxy-domain": { type: "string[]", description: "Domain used for proxying ports." },
   "skip-auth-preflight": {
     type: "boolean",
@@ -428,10 +434,6 @@ export const parse = (
         throw new Error("--github-auth can only be set in the config file or passed in via $GITHUB_TOKEN")
       }
 
-      if (key === "idle-timeout-seconds" && Number(value) <= 60) {
-        throw new Error("--idle-timeout-seconds must be greater than 60 seconds.")
-      }
-
       const option = options[key]
       if (option.type === "boolean") {
         ;(args[key] as boolean) = true
@@ -449,6 +451,10 @@ export const parse = (
         continue
       } else if (!value) {
         throw error(`--${key} requires a value`)
+      }
+
+      if (key === "idle-timeout-seconds" && Number(value) <= 60) {
+        throw new Error("--idle-timeout-seconds must be greater than 60 seconds.")
       }
 
       if (option.type === OptionalString && value === "false") {
@@ -561,7 +567,7 @@ export async function setDefaults(cliArgs: UserProvidedArgs, configArgs?: Config
   }
 
   if (!args["session-socket"]) {
-    args["session-socket"] = path.join(args["user-data-dir"], "code-server-ipc.sock")
+    args["session-socket"] = defaultSessionSocket(args["user-data-dir"])
   }
   process.env.CODE_SERVER_SESSION_SOCKET = args["session-socket"]
 
@@ -708,6 +714,25 @@ export async function setDefaults(cliArgs: UserProvidedArgs, configArgs?: Config
     usingEnvPassword,
     usingEnvHashedPassword,
   } as DefaultedArgs // TODO: Technically no guarantee this is fulfilled.
+}
+
+/**
+ * The session socket to use when one was not given.
+ *
+ * Windows has no Unix sockets, so there it is a named pipe, which lives in its
+ * own namespace rather than on disk and so cannot be placed inside the user
+ * data directory. The name is derived from that directory anyway, so that two
+ * instances with separate data directories do not collide and a later
+ * invocation with the same one finds the first. Windows paths are compared
+ * without regard to case, so the name is folded before it is hashed; otherwise
+ * the same directory typed two ways would produce two pipes.
+ */
+export function defaultSessionSocket(userDataDir: string, platform: NodeJS.Platform = process.platform): string {
+  if (platform !== "win32") {
+    return path.join(userDataDir, "code-server-ipc.sock")
+  }
+  const name = crypto.createHash("sha256").update(path.resolve(userDataDir).toLowerCase()).digest("hex").slice(0, 16)
+  return String.raw`\\.\pipe\code-server-ipc-${name}`
 }
 
 export function getResolvedPathsFromArgs(args: UserProvidedArgs): string[] {

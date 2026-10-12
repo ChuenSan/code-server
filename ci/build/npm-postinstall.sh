@@ -18,7 +18,7 @@ symlink() {
   dest="$2"
   rm -rf "$dest"
   case $OS in
-    windows) mklink /J "$dest" "$source" ;;
+    windows) cmd //c mklink //J "$dest" "$source" ;;
     *) ln -s "$source" "$dest" ;;
   esac
 }
@@ -67,7 +67,7 @@ main() {
 
   if [ "$major_node_version" -ne "${FORCE_NODE_VERSION:-24}" ]; then
     echo "ERROR: code-server currently requires node v24."
-    if [ -n "$FORCE_NODE_VERSION" ]; then
+    if [ -n "${FORCE_NODE_VERSION:-}" ]; then
       echo "However, you have overrided the version check to use v$FORCE_NODE_VERSION."
     fi
     echo "We have detected that you are on node v$major_node_version"

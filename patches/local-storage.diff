@@ -18,7 +18,7 @@ Index: code-server/lib/vscode/src/vs/server/node/webClientServer.ts
 ===================================================================
 --- code-server.orig/lib/vscode/src/vs/server/node/webClientServer.ts
 +++ code-server/lib/vscode/src/vs/server/node/webClientServer.ts
-@@ -375,6 +375,7 @@ export class WebClientServer {
+@@ -420,6 +420,7 @@ export class WebClientServer {
  			remoteAuthority,
  			serverBasePath: basePath,
  			webviewEndpoint: staticRoute + '/out/vs/workbench/contrib/webview/browser/pre',
@@ -46,7 +46,7 @@ Index: code-server/lib/vscode/src/vs/workbench/services/environment/browser/envi
 ===================================================================
 --- code-server.orig/lib/vscode/src/vs/workbench/services/environment/browser/environmentService.ts
 +++ code-server/lib/vscode/src/vs/workbench/services/environment/browser/environmentService.ts
-@@ -102,7 +102,14 @@ export class BrowserWorkbenchEnvironment
+@@ -107,7 +107,14 @@ export class BrowserWorkbenchEnvironment
  	get logFile(): URI { return joinPath(this.windowLogsPath, 'window.log'); }
  
  	@memoize
@@ -66,7 +66,7 @@ Index: code-server/lib/vscode/src/vs/workbench/services/configuration/browser/co
 ===================================================================
 --- code-server.orig/lib/vscode/src/vs/workbench/services/configuration/browser/configurationService.ts
 +++ code-server/lib/vscode/src/vs/workbench/services/configuration/browser/configurationService.ts
-@@ -148,8 +148,10 @@ export class WorkspaceService extends Di
+@@ -150,8 +150,10 @@ export class WorkspaceService extends Di
  		this.workspaceConfiguration = this._register(new WorkspaceConfiguration(configurationCache, fileService, uriIdentityService, logService));
  		this._register(this.workspaceConfiguration.onDidUpdateConfiguration(fromCache => {
  			this.onWorkspaceConfigurationChanged(fromCache).then(() => {
@@ -79,7 +79,7 @@ Index: code-server/lib/vscode/src/vs/workbench/services/configuration/browser/co
  			});
  		}));
  
-@@ -561,6 +563,12 @@ export class WorkspaceService extends Di
+@@ -563,6 +565,12 @@ export class WorkspaceService extends Di
  			previousFolders = this.workspace.folders;
  			this.workspace.update(workspace);
  		} else {

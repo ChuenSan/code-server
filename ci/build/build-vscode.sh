@@ -24,6 +24,7 @@ fix-bin-script() {
   # Fix Node path on Windows.
   sed -i.bak 's/^set ROOT_DIR=\(.*\)$/set ROOT_DIR=%~dp0..\\..\\..\\..\r\nset VSROOT_DIR=\1/g' "$script"
   sed -i.bak 's/%ROOT_DIR%\\out/%VSROOT_DIR%\\out/g' "$script"
+  sed -i.bak 's/%ROOT_DIR%\\node.exe/%ROOT_DIR%\\lib\\node.exe/g' "$script"
 
   chmod +x "$script"
   rm "$script.bak"
@@ -57,10 +58,17 @@ main() {
     exit 1
   fi
 
-  # Add the date, our name, links, enable telemetry (this just makes telemetry
-  # available; telemetry can still be disabled by flag or setting), and
-  # configure trusted extensions (since some, like github.copilot-chat, never
-  # ask to be trusted and this is the only way to get auth working).
+  # Modify the product.json:
+  # - Add the date
+  # - Set the code-server name.
+  # - Add our links
+  # - Enable telemetry (this just makes telemetry available; telemetry can still
+  #   be disabled by flag or setting)
+  # - Configure trusted extensions (since some, like github.copilot-chat, never
+  #   ask to be trusted and this is the only way to get auth working).
+  # - Make Typescript server plugins run in the workspace.  We build the remote
+  #   server version, so there is no browser distribution, and this key is not
+  #   added automatically.
   #
   # This needs to be done before building as Code will read this file and embed
   # it into the client-side code.
@@ -102,6 +110,9 @@ main() {
     ],
     "aiConfig": {
       "ariaKey": "code-server"
+    },
+    "extensionPointExtensionKind": {
+      "typescriptServerPlugins": ["workspace"]
     }
   }
 EOF
@@ -132,7 +143,7 @@ EOF
   # Set vars and fix paths.
   case $OS in
     windows)
-      fix-bin-script remote-cli/code.cmd
+      fix-bin-script remote-cli/code-server.cmd
       fix-bin-script helpers/browser.cmd
       ;;
     *)
