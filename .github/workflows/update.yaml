@@ -6,8 +6,6 @@ on:
       version:
         type: string
         required: true
-  schedule:
-    - cron: "0 16,21 * * *"
 
 jobs:
   update:
